@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "@types/node": "^18.19.103",
+    "undici-types": "^7.10.0"
+  }
+}

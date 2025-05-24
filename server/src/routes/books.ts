@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { db } from "../db/db.js";
 
 interface Book {
     id: number;
@@ -7,46 +8,37 @@ interface Book {
     year: number;
 }
 
-let books: Book[] = [
-    { id: 1, title: "1984", author: "George Orwell", year: 1949 },
-    { id: 2, title: "A tanítvány", author: "Thomas Bernhard", year: 1984 }
-];
-
-let nextId = 3;
-
 export const booksRouter = Router();
 
 // GET all books
-booksRouter.get("/", (req, res) => {
-    res.json(books);
+booksRouter.get("/", async (_req, res) => {
+    const result = await db.query("SELECT * FROM books ORDER BY id");
+    res.json(result.rows);
 });
 
 // POST new book
-booksRouter.post("/", (req, res) => {
-    const { title, author, year } = req.body;
-    const newBook = { id: nextId++, title, author, year };
-    books.push(newBook);
-    res.status(201).json(newBook);
+booksRouter.post("/", async (req, res) => {
+    const { title, author, year, image_url } = req.body;
+    const result = await db.query(
+        "INSERT INTO books (title, author, year, image_url) VALUES ($1, $2, $3, $4) RETURNING *",
+        [title, author, year, image_url]
+    );
+    res.status(201).json(result.rows[0]);
 });
 
 // PUT update book
-booksRouter.put("/:id", (req, res) => {
-    const bookId = parseInt(req.params.id);
-    const { title, author, year } = req.body;
-
-    const book = books.find(b => b.id === bookId);
-    if (!book) return res.status(404).json({ error: "Book not found" });
-
-    book.title = title;
-    book.author = author;
-    book.year = year;
-
-    res.json(book);
+booksRouter.put("/:id", async (req, res) => {
+    const { title, author, year, image_url } = req.body;
+    const result = await db.query(
+        "UPDATE books SET title=$1, author=$2, year=$3, image_url=$4 WHERE id=$5 RETURNING *",
+        [title, author, year, image_url, req.params.id]
+    );
+    if (result.rowCount === 0) return res.status(404).json({ error: "Book not found" });
+    res.json(result.rows[0]);
 });
 
 // DELETE book
-booksRouter.delete("/:id", (req, res) => {
-    const bookId = parseInt(req.params.id);
-    books = books.filter(b => b.id !== bookId);
+booksRouter.delete("/:id", async (req, res) => {
+    const result = await db.query("DELETE FROM books WHERE id=$1", [req.params.id]);
     res.status(204).end();
 });
