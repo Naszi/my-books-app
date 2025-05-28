@@ -14,15 +14,22 @@ interface Props {
 }
 
 export const BookList: React.FC<Props> = ({ books, onDelete }) => (
-    <div className="book-list">
-        {books.map(book => (
-            <div key={book.id} className="book-card">
-                <h3>{book.title}</h3>
-                <img src={book.image_url} alt={book.title} style={{ maxWidth: "100px" }} />
-                <p><strong>Szerző:</strong> {book.author}</p>
-                <p><strong>Év:</strong> {book.year}</p>
-                <button onClick={() => onDelete(book.id)}>Törlés</button>
-            </div>
-        ))}
+    <div className="grid gap-4">
+  {books.map(book => (
+    <div key={book.id} className="p-4 bg-white rounded shadow hover:shadow-md transition">
+      <h3 className="text-lg font-semibold">{book.title}</h3>
+      <p className="text-sm text-gray-700">Szerző: {book.author}</p>
+      <p className="text-sm text-gray-500">Év: {book.year}</p>
+      {book.image_url && (
+        <img src={book.image_url} alt={book.title} className="mt-2 max-w-[120px] rounded" />
+      )}
+      <button
+        onClick={() => onDelete(book.id)}
+        className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+      >
+        Törlés
+      </button>
     </div>
+  ))}
+</div>
 );

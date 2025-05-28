@@ -33,10 +33,11 @@ function App() {
 
     return (
         <div className="app">
-            <h1>Könyvek</h1>
+            <h1 className="text-3xl font-bold text-center my-4">Könyvek</h1>
             <AddBookForm onAdd={addBook} />
             <BookList books={books} onDelete={deleteBook} />
         </div>
+        
     );
 }
 
