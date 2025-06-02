@@ -31,9 +31,23 @@ function App() {
     setBooks((prev) => prev.filter((b) => b.id !== id));
   };
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const filteredBooks = books.filter(b =>
+      b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b.author.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="app space-y-4 p-4 max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold text-center my-4">Könyvek</h1>
+      <input
+          type="text"
+          placeholder="Keresés cím vagy szerző alapján..."
+          className="w-full p-2 border rounded mb-4"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+      />
+      <BookList books={filteredBooks} onDelete={deleteBook} />
       <AddBookForm onAdd={addBook} />
       <BookList books={books} onDelete={deleteBook} />
     </div>
